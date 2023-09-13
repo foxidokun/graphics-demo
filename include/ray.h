@@ -3,16 +3,16 @@
 
 class Ray {
 public:
-    Point orig;
-    Vector dir;
+    Point origin;
+    Vector direction;
 
     Ray() {};
     Ray(const Point& origin, const Vector& direction):
-        orig(origin),
-        dir(direction)
+        origin(origin),
+        direction(direction)
         {};
 
     Point at(double t) const {
-        return orig + t * dir;
+        return origin + t * direction;
     }
 };
