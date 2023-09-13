@@ -74,7 +74,7 @@ public:
         return sqrt(x * x + y * y);
     }
 
-    void normalize();
+    Vector normalize() const;
 };
 
 Vector operator*(const double& scalar, const Vector& vec);

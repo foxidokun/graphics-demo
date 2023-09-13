@@ -16,7 +16,7 @@ void draw_vector(sf::RenderWindow &window, const Coordinates &coords, const Vect
     window.draw(line, 2, sf::Lines);
 
     // Calculate coordinates of two other tip points
-    Vector opposite = normalized(-vec) / 5;
+    Vector opposite = -vec.normalize() / 5;
     Vector ortho = Vector(-opposite.y, opposite.x);
 
     Vector left_point = vec + 2 * opposite + ortho;

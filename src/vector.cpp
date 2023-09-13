@@ -37,14 +37,7 @@ void Vector::rotate_deg(double deg) {
     rotate_rad(M_PI / 180 * deg);
 }
 
-void Vector::normalize() {
+Vector Vector::normalize() const {
     double len = length();
-    *this /= len;
-}
-
-Vector normalized(const Vector& vec) {
-    Vector copy = vec;
-
-    copy.normalize();
-    return copy;
+    return *this / len;
 }
