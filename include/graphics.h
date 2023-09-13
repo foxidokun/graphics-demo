@@ -4,9 +4,44 @@
 #include <SFML/Graphics.hpp>
 #include "coordinates.h"
 #include "vector.h"
+#include <cassert>
+#include <cstdio>
+#include <stdint.h>
 
-void draw_vector(sf::RenderWindow& window, const Coordinates& coords, const Vector& vec,
-    const sf::Color& color = sf::Color::White);
-void draw_coordinates(sf::RenderWindow& window, const Coordinates& coords);
+class Color {
+public:
+    double r;
+    double g;
+    double b;
+
+    Color() = default;
+    Color(double r, double g, double b): 
+        r(r),
+        g(g),
+        b(b)
+        {};
+};
+
+class Point {
+public:
+    double x;
+    double y;
+    double z;
+
+    Point() = default;
+
+    Point(double x, double y, double z): 
+        x(x),
+        y(y),
+        z(z)
+        {};
+};
+
+static inline void draw_pixel(sf::Image& image, Color& color, uint x, uint y) {
+    assert(x < image.getSize().x);
+    assert(y < image.getSize().y);
+
+    image.setPixel(x, y, sf::Color(color.r * 255.0, color.g * 255.0, color.b * 255.0));
+}
 
 #endif //VECTOR_GRAPHICS_H
