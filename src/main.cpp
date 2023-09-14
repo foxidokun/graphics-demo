@@ -11,6 +11,8 @@
 #include "common.h"
 #include "interval.h"
 
+static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
+
 Color ray_color(const Ray& ray, const Hittable& world) {
     HitData rec;
     if (world.hit(ray, Interval(0, infinity), rec)) {
@@ -27,6 +29,7 @@ int main() {
 
     double focal_length = 1.0;
     double viewport_height = 2.0;
+    int number_of_samples = 10;
     double viewport_width = viewport_height * ((double)(WINDOW_WIDTH)/WINDOW_HEIGHT);
     Point camera_center(0, 0, 0);
 
@@ -65,11 +68,18 @@ int main() {
         for (int x = 0; x < WINDOW_WIDTH; ++x) {
             for (int y = 0; y < WINDOW_HEIGHT; ++y) {
                 Point pixel_center = pixel00_loc + (x * pixel_delta_u) + (y * pixel_delta_v);
-                Vector ray_direction = pixel_center - camera_center;
-                Ray r(camera_center, ray_direction);
+                Color pixel_color;
 
-                Color pixel_color = ray_color(r, world);   
-                draw_pixel(image, pixel_color, x, y);
+                for (int i = 0; i < number_of_samples; ++i) {
+                    Point pixel_sample = pixel_center + pixel_sample_square(pixel_delta_u, pixel_delta_v);
+
+                    Vector ray_direction = pixel_sample - camera_center;
+                    Ray r(camera_center, ray_direction);
+
+                    pixel_color += ray_color(r, world); 
+                }
+
+                draw_pixel(image, pixel_color, x, y, number_of_samples);
             }
         } 
 
@@ -82,7 +92,9 @@ int main() {
     }
 }
 
-static uint64_t epoch_millisec() {
-    namespace chrono = std::chrono;
-    return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+/// Returns a random point in the square surrounding a pixel at the origin.
+static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v) {
+    auto px = -0.5 + random_double();
+    auto py = -0.5 + random_double();
+    return (px * pixel_delta_u) + (py * pixel_delta_v);
 }
