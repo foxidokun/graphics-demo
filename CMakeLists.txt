@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 find_package(SFML REQUIRED COMPONENTS graphics window system)
+find_package(OpenMP)
 
 file(GLOB SRCS
         "${PROJECT_SOURCE_DIR}/include/*.h"
@@ -15,3 +16,4 @@ file(GLOB SRCS
 
 add_executable(vector ${SRCS})
 target_link_libraries(vector PRIVATE sfml-graphics sfml-system sfml-window)
+target_link_libraries(vector PUBLIC OpenMP::OpenMP_CXX)
