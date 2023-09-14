@@ -23,9 +23,9 @@ public:
     double y;
     double z;
 
-    constexpr Point() = default;
+    Point() = default;
 
-    constexpr Point(double x, double y, double z): 
+    Point(double x, double y, double z): 
         x(x),
         y(y),
         z(z)

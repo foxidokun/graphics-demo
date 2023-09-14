@@ -1,6 +1,6 @@
-#include "shapes.h"
+#include "scene.h"
 
-bool Sphere::hit(const Ray& ray, double ray_tmin, double ray_tmax, HitData& hit_data) const {
+bool Sphere::hit(const Ray& ray, const Interval& render_interval, HitData& hit_data) const {
     Vector oc = ray.origin - center;
     double a = ray.direction.length_square();
     double half_b = dot(oc, ray.direction);
@@ -15,9 +15,9 @@ bool Sphere::hit(const Ray& ray, double ray_tmin, double ray_tmax, HitData& hit_
 
     // // Find the nearest root that lies in the acceptable range.
     double root = (-half_b - sq_discr) / a;
-    if (root <= ray_tmin || root >= ray_tmax) {
+    if (!render_interval.surrounds(root)) {
         root = (-half_b + sq_discr) / a;
-        if (root <= ray_tmin || root >= ray_tmax) {
+        if (!render_interval.surrounds(root)) {
             return false;
         }
     }

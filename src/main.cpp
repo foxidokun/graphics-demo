@@ -7,32 +7,18 @@
 #include "primitives.h"
 #include "ray.h"
 #include "config.h"
+#include "scene.h"
+#include "common.h"
+#include "interval.h"
 
-
-// TODO: Повторить или расписать в комментах к коду всю алгебру к деду
-double hit_sphere(const Point& center, double radius, const Ray& r) {
-    Vector oc = r.origin - center;
-    double a = r.direction.length_square();
-    double half_b = dot(oc, r.direction);
-    double c = oc.length_square() - radius*radius;
-    double discriminant = half_b*half_b - a*c;
-    
-    if (discriminant < 0) {
-        return -1.0;
-    } else {
-        return (-half_b - sqrt(discriminant)) / a;
-    }
-}
-
-Color ray_color(const Ray& r) {
-    auto t = hit_sphere(Point(0,0,-1), 0.5, r);
-    if (t > 0.0) {
-        Vector N = (r.at(t) - Point(0,0,-1)).norm();
-        return 0.5*Color(N.x+1, N.y+1, N.z+1);
+Color ray_color(const Ray& ray, const Hittable& world) {
+    HitData rec;
+    if (world.hit(ray, Interval(0, infinity), rec)) {
+        return 0.5 * (rec.normal + White);
     }
 
-    Vector unit_direction = r.direction.norm();
-    auto a = 0.5*(unit_direction.y + 1.0);
+    Vector unit_direction = ray.direction.norm();
+    double a = 0.5*(unit_direction.y + 1.0);
     return (1.0-a)*White + a*LightBlue;
 }
 
@@ -60,6 +46,13 @@ int main() {
     bufferSprite.setTexture(buffer);
     sf::Image image = buffer.copyToImage();
 
+    Scene world;
+    Sphere main_sphere(Point(0,0,-1), 0.5);
+    Sphere lawn(Point(0,-100.5,-1), 100);
+
+    world.add(&main_sphere);
+    world.add(&lawn);
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -75,7 +68,7 @@ int main() {
                 Vector ray_direction = pixel_center - camera_center;
                 Ray r(camera_center, ray_direction);
 
-                Color pixel_color = ray_color(r);   
+                Color pixel_color = ray_color(r, world);   
                 draw_pixel(image, pixel_color, x, y);
             }
         } 
