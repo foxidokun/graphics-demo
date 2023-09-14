@@ -3,22 +3,37 @@
 #include <SFML/Graphics.hpp>
 #include "coordinates.h"
 #include "vector.h"
+#include "config.h"
+#include "scene.h"
 #include "primitives.h"
 #include <cassert>
 #include <cstdio>
 #include <stdint.h>
 #include "interval.h"
 
-static inline void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num) {
-    assert(x < image.getSize().x);
-    assert(y < image.getSize().y);
+class Renderer {
+private:
+    int image_width;
+    int image_height;
+    Point camera_pos;
+    Point pixel00_loc; // Location of (0, 0) pixel
+    Vector pixel_delta_x;
+    Vector pixel_delta_y;
+    int samples_num;
 
-    Interval allowed_intensivity(0, 1.0);
-    color /= samples_num;
+    void initialize();
+public:
+    
+    Renderer(int image_width, int image_height, int samples_num = SAMPLES_NUM):
+    image_width(image_width),
+    image_height(image_height),
+    samples_num(samples_num)
+    {
+        initialize();
+    }
 
-    uint red   = allowed_intensivity.clamp(color.x) * 255.0;
-    uint green = allowed_intensivity.clamp(color.y) * 255.0;
-    uint blue  = allowed_intensivity.clamp(color.z) * 255.0;
 
-    image.setPixel(x, y, sf::Color(red, green, blue));
-}
+    void render(sf::Image& image, const Hittable& world) const;
+};
+
+

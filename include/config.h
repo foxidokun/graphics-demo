@@ -6,4 +6,6 @@ const int WINDOW_HEIGHT = 600;
 const char *const WINDOW_TITLE = "Vectors";
 const float TIP_RADIUS = 2.0;
 
+const int SAMPLES_NUM = 10;
+
 #endif //VECTOR_CONFIG_H
