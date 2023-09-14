@@ -8,7 +8,7 @@ public:
     Point origin;
     Vector direction;
 
-    Ray() {};
+    Ray() = default;
     Ray(const Point& origin, const Vector& direction):
         origin(origin),
         direction(direction)

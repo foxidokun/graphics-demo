@@ -18,7 +18,7 @@ public:
 
     void set_face_normal(const Ray& ray, const Vector& outward_normal) {
         // NOTE: the parameter `outward_normal` is assumed to have unit length.
-        assert(abs(outward_normal.length() - 1.0) < 1e-5);
+        assert(fabs(outward_normal.length() - 1.0) < 1e-5);
         
         // Sets the hit record normal vector.
         front_face = dot(ray.direction, outward_normal) < 0;

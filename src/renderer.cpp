@@ -29,8 +29,8 @@ void Renderer::initialize() {
 
 void Renderer::render(sf::Image& image, const Hittable& world) const {
     #pragma omp parallel for
-    for (int x = 0; x < image_width; ++x) {
-        for (int y = 0; y < image_height; ++y) {
+    for (uint x = 0; x < image_width; ++x) {
+        for (uint y = 0; y < image_height; ++y) {
             Point pixel_center = pixel00_loc + (x * pixel_delta_x) + (y * pixel_delta_y);
             Color pixel_color;
 
