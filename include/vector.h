@@ -78,10 +78,10 @@ public:
     // ##############
 
     double length() const {
-        return sqrt(lendth_square());
+        return sqrt(length_square());
     }
 
-    double lendth_square() const {
+    double length_square() const {
         return x * x + y * y + z * z;
     }
 
