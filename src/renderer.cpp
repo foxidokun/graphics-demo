@@ -3,7 +3,7 @@
 static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num);
 static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
 
-static Color ray_color(const Ray& ray, const Hittable& world);
+static Color ray_color(const Ray& ray, const Hittable& world, uint depth);
 
 void Renderer::initialize() {
     camera_pos = Point(0, 0, 0);
@@ -40,7 +40,7 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
                 Vector ray_direction = pixel_sample - camera_pos;
                 Ray ray(camera_pos, ray_direction);
 
-                pixel_color += ray_color(ray, world); 
+                pixel_color += ray_color(ray, world, render_depth); 
             }
 
             draw_pixel(image, pixel_color, x, y, samples_num);
@@ -48,11 +48,15 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
     } 
 }
 
-static Color ray_color(const Ray& ray, const Hittable& world) {
+static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
+    if (depth == 0) {
+        return Color(0,0,0);
+    }
+
     HitData rec;
     if (world.hit(ray, Interval(0, infinity), rec)) {
         Vector direction = random_reflection(rec.normal);
-        return 0.5 * ray_color(Ray(rec.p, direction), world);
+        return 0.5 * ray_color(Ray(rec.p, direction), world, depth-1);
     }
 
     Vector unit_direction = ray.direction.norm();

@@ -19,15 +19,17 @@ private:
     Point pixel00_loc; // Location of (0, 0) pixel
     Vector pixel_delta_x;
     Vector pixel_delta_y;
-    int samples_num;
+    uint samples_num;
+    uint render_depth;
 
     void initialize();
 public:
     
-    Renderer(int image_width, int image_height, int samples_num = SAMPLES_NUM):
+    Renderer(int image_width, int image_height, uint samples_num = SAMPLES_NUM, uint render_depth = RENDER_DEPTH):
     image_width(image_width),
     image_height(image_height),
-    samples_num(samples_num)
+    samples_num(samples_num),
+    render_depth(render_depth)
     {
         initialize();
     }
