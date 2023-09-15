@@ -54,7 +54,7 @@ static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
     }
 
     HitData rec;
-    if (world.hit(ray, Interval(0, infinity), rec)) {
+    if (world.hit(ray, Interval(0.0001, infinity), rec)) {
         Vector direction = random_reflection(rec.normal);
         return 0.5 * ray_color(Ray(rec.p, direction), world, depth-1);
     }
