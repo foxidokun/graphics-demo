@@ -51,7 +51,8 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
 static Color ray_color(const Ray& ray, const Hittable& world) {
     HitData rec;
     if (world.hit(ray, Interval(0, infinity), rec)) {
-        return 0.5 * (rec.normal + White);
+        Vector direction = random_reflection(rec.normal);
+        return 0.5 * ray_color(Ray(rec.p, direction), world);
     }
 
     Vector unit_direction = ray.direction.norm();

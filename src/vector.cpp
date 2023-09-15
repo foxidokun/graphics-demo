@@ -48,3 +48,23 @@ double dot(const Vector& lhs, const Vector& rhs) {
            lhs.y * rhs.y +
            lhs.z * rhs.z;
 }
+
+Vector random_reflection(const Vector& norm) {
+    Vector reflected;
+
+    while (true) {
+        reflected = Vector::random(-1.0, +1.0);
+        double len_aq = reflected.length_square();
+        if (len_aq <= 1 && len_aq >= 0.01) {
+            break;
+        } 
+    }
+
+    reflected = reflected.norm();
+
+    if (dot(norm, reflected) > 0.0) {
+        return reflected;
+    } else {
+        return -reflected;
+    }
+}

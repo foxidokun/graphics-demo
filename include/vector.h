@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include "common.h"
 
 class Vector {
 public:
@@ -29,6 +30,14 @@ public:
         y(point[1]),
         z(point[2])
     {}
+
+    static Vector random() {
+        return Vector(random_double(), random_double(), random_double());
+    }
+
+    static Vector random(double min, double max) {
+        return Vector(random_double(min,max), random_double(min,max), random_double(min,max));
+    }
 
     // ############
     // Operators
@@ -96,5 +105,7 @@ Vector operator-(const Vector& lhs, const Vector& rhs);
 double dot(const Vector& lhs, const Vector& rhs);
 
 std::ostream& operator<<(std::ostream &out, const Vector &vec);
+
+Vector random_reflection(const Vector& norm);
 
 #endif //VECTOR_VECTOR_H
