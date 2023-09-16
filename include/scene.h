@@ -5,6 +5,9 @@
 #include "interval.h"
 #include <cassert>
 
+// To avoid cyclic import
+class Material;
+
 // #####################
 // Data about single hit
 // #####################
@@ -15,6 +18,7 @@ public:
     Vector normal;
     double t;
     bool front_face;
+    const Material* mat;
 
     void set_face_normal(const Ray& ray, const Vector& outward_normal) {
         // NOTE: the parameter `outward_normal` is assumed to have unit length.
@@ -44,10 +48,12 @@ class Sphere: public Hittable {
 public:
     Point center;
     double radius;
+    const Material* mat;
 
-    Sphere(Point center, double radius):
+    Sphere(Point center, double radius, const Material *mat):
         center(center),
-        radius(radius)
+        radius(radius),
+        mat(mat)
         {};
     
     bool hit(const Ray& ray, const Interval& render_interval, HitData& hit_data) const final;

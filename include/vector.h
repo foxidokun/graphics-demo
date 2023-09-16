@@ -95,6 +95,12 @@ public:
     }
 
     Vector norm() const;
+
+    bool near_zero() const {
+        return (fabs(x) < NEAR_ZERO_VEC_1DLEN) &&
+               (fabs(y) < NEAR_ZERO_VEC_1DLEN) &&
+               (fabs(z) < NEAR_ZERO_VEC_1DLEN);
+    }
 };
 
 Vector operator*(const double& scalar, const Vector& vec);
@@ -106,6 +112,8 @@ double dot(const Vector& lhs, const Vector& rhs);
 
 std::ostream& operator<<(std::ostream &out, const Vector &vec);
 
+Vector random_unit_vector();
 Vector random_reflection(const Vector& norm);
+Vector reflect(const Vector& vec, const Vector& norm);
 
 #endif //VECTOR_VECTOR_H

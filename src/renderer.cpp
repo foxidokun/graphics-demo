@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "material.h"
 
 static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num);
 static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
@@ -53,10 +54,13 @@ static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
         return Color(0,0,0);
     }
 
-    HitData rec;
-    if (world.hit(ray, Interval(0.0001, infinity), rec)) {
-        Vector direction = rec.normal + random_reflection(rec.normal);
-        return 0.5 * ray_color(Ray(rec.p, direction), world, depth-1);
+    HitData hit;
+    if (world.hit(ray, Interval(0.0001, infinity), hit)) {
+        Ray scattered;
+        Color attenuation;
+        if (hit.mat->scatter(ray, hit, attenuation, scattered))
+            return attenuation * ray_color(scattered, world, depth-1);
+        return Color(0,0,0);
     }
 
     Vector unit_direction = ray.direction.norm();

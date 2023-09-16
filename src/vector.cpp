@@ -49,22 +49,32 @@ double dot(const Vector& lhs, const Vector& rhs) {
            lhs.z * rhs.z;
 }
 
-Vector random_reflection(const Vector& norm) {
-    Vector reflected;
+Vector random_unit_vector() {
+    Vector random_vec;
 
     while (true) {
-        reflected = Vector::random(-1.0, +1.0);
-        double len_aq = reflected.length_square();
+        random_vec = Vector::random(-1.0, +1.0);
+        double len_aq = random_vec.length_square();
         if (len_aq <= 1 && len_aq >= 0.01) {
             break;
         } 
     }
 
-    reflected = reflected.norm();
+    random_vec = random_vec.norm();
+
+    return random_vec;
+}
+
+Vector random_reflection(const Vector& norm) {
+    Vector reflected = random_unit_vector();
 
     if (dot(norm, reflected) > 0.0) {
         return reflected;
     } else {
         return -reflected;
     }
+}
+
+Vector reflect(const Vector& vec, const Vector& norm) {
+    return vec - 2*dot(vec,norm)*norm;
 }

@@ -27,6 +27,7 @@ bool Sphere::hit(const Ray& ray, const Interval& render_interval, HitData& hit_d
     hit_data.p = ray.at(hit_data.t);
     Vector outward_normal = (hit_data.p - center) / radius;
     hit_data.set_face_normal(ray, outward_normal);
+    hit_data.mat = mat;
 
     return true;
 }

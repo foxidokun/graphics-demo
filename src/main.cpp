@@ -10,8 +10,37 @@
 #include "scene.h"
 #include "common.h"
 #include "interval.h"
+#include "material.h"
+
+static void render_preview_mode(const Scene& world);
 
 int main() {
+    const Lambertian material_ground = Lambertian(Color(0.8, 0.8, 0.0));
+    const Lambertian material_center = Lambertian(Color(0.7, 0.3, 0.3));
+    const Metal material_left        = Metal(Color(0.8, 0.8, 0.8));
+    const Metal material_right       = Metal(Color(0.8, 0.6, 0.2));
+
+    Scene world;
+
+    Sphere lawn(Point( 0.0, -100.5, -1.0), 100.0, &material_ground);
+    Sphere center(Point( 0.0,    0.0, -1.0),   0.5, &material_center);
+    Sphere left(Point(-1.0,    0.0, -1.0),   0.5, &material_left);
+    Sphere right(Point( 1.0,    0.0, -1.0),   0.5, &material_right);
+
+    world.add(&lawn);
+    world.add(&center);
+    world.add(&left);
+    world.add(&right);
+
+    #if PREVIEW_MODE
+        render_preview_mode(world);
+    #else
+        #error "Not implemented yet"
+    #endif
+}
+
+
+static void render_preview_mode(const Scene& world) {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 
 	sf::Texture buffer;
@@ -22,19 +51,12 @@ int main() {
 
     Renderer render(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Scene world;
-    Sphere main_sphere(Point(0,0,-1), 0.5);
-    Sphere lawn(Point(0,-100.5,-1), 100);
-
-    world.add(&main_sphere);
-    world.add(&lawn);
-
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-                return 0;
+                return;
             }
         }
 

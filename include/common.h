@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include "config.h"
 
 const double infinity = std::numeric_limits<double>::infinity();
 
