@@ -2,7 +2,7 @@
 
 static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num);
 static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
-
+static inline double gamma_correction(double value);
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth);
 
 void Renderer::initialize() {
@@ -71,11 +71,19 @@ static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int sample
     Interval allowed_intensivity(0, 1.0);
     color /= samples_num;
 
-    uint red   = allowed_intensivity.clamp(color.x) * 255.0;
-    uint green = allowed_intensivity.clamp(color.y) * 255.0;
-    uint blue  = allowed_intensivity.clamp(color.z) * 255.0;
+    double red   = gamma_correction(color.x);
+    double green = gamma_correction(color.y);
+    double blue  = gamma_correction(color.z);
+
+    red   = allowed_intensivity.clamp(red)   * 255.0;
+    green = allowed_intensivity.clamp(green) * 255.0;
+    blue  = allowed_intensivity.clamp(blue)  * 255.0;
 
     image.setPixel(x, y, sf::Color(red, green, blue));
+}
+
+static inline double gamma_correction(double value) {
+    return sqrt(value);
 }
 
 /// Returns a random point in the square surrounding a pixel at the origin.
