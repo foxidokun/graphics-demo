@@ -15,16 +15,7 @@ public:
 
     Lambertian(const Color& albedo) : albedo(albedo) {}
 
-    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final {
-        Vector scatter_direction = hit.normal + random_unit_vector();
-        if (scatter_direction.near_zero()) { // Fix bad random choices
-            scatter_direction = hit.normal;
-        }
-
-        scattered = Ray(hit.p, scatter_direction);
-        attenuation = albedo;
-        return true;
-    }
+    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final;
 };
 
 class Metal: public Material {
@@ -37,10 +28,18 @@ public:
         fuzz(fuzz < 1 ? fuzz : 1)
         {}
 
-    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final {
-        Vector reflected = reflect(ray_in.direction.norm(), hit.normal);
-        scattered = Ray(hit.p, reflected + fuzz * random_unit_vector());
-        attenuation = albedo;
-        return (dot(scattered.direction, hit.normal) > 0.0);
-    }
+    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final;
+};
+
+class Dielectric: public Material {
+public:
+    Color albedo;
+    double ir; // Index of Refraction
+
+    Dielectric(const Color& albedo,double index_of_refraction):
+        albedo(albedo),
+        ir(index_of_refraction)
+        {}
+
+    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final;
 };

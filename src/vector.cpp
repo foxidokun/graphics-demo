@@ -78,3 +78,15 @@ Vector random_reflection(const Vector& norm) {
 Vector reflect(const Vector& vec, const Vector& norm) {
     return vec - 2*dot(vec,norm)*norm;
 }
+
+/// @brief 
+/// @param ray 
+/// @param norm 
+/// @param eta_rel -- relative eta of materials  
+/// @return 
+Vector refract(const Vector& ray, const Vector& norm, double eta_rel) {
+    double cos_theta = fmin(dot(-ray, norm), 1.0);
+    Vector r_out_perp = eta_rel * (ray + cos_theta*norm);
+    Vector r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_square())) * norm;
+    return r_out_perp + r_out_parallel;
+}

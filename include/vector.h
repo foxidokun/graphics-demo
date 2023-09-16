@@ -115,5 +115,6 @@ std::ostream& operator<<(std::ostream &out, const Vector &vec);
 Vector random_unit_vector();
 Vector random_reflection(const Vector& norm);
 Vector reflect(const Vector& vec, const Vector& norm);
+Vector refract(const Vector& ray, const Vector& norm, double eta_rel);
 
 #endif //VECTOR_VECTOR_H
