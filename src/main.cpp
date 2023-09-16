@@ -17,8 +17,8 @@ static void render_preview_mode(const Scene& world);
 int main() {
     const Lambertian material_ground = Lambertian(Color(0.8, 0.8, 0.0));
     const Lambertian material_center = Lambertian(Color(0.7, 0.3, 0.3));
-    const Metal material_left        = Metal(Color(0.8, 0.8, 0.8));
-    const Metal material_right       = Metal(Color(0.8, 0.6, 0.2));
+    const Metal material_left        = Metal(Color(0.8, 0.8, 0.8), 0.3);
+    const Metal material_right       = Metal(Color(0.8, 0.6, 0.2), 1.0);
 
     Scene world;
 
