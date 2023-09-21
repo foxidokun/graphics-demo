@@ -16,7 +16,7 @@ static void render_preview_mode(const Scene& world);
 
 int main() {
     const Lambertian material_ground = Lambertian(Color(0.8, 0.8, 0.0));
-    const Dielectric material_center = Dielectric(Color(0.7, 0.3, 0.3), 1.5);
+    const Lambertian material_center = Lambertian(Color(0.1, 0.2, 0.5));
     const Dielectric material_left   = Dielectric(Color(1.0, 1.0, 1.0), 1.5);
     const Metal material_right       = Metal(Color(0.8, 0.6, 0.2), 1.0);
 

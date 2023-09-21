@@ -109,6 +109,7 @@ Vector operator+(const Vector& lhs, const Vector& rhs);
 Vector operator-(const Vector& lhs, const Vector& rhs);
 
 double dot(const Vector& lhs, const Vector& rhs);
+Vector cross(const Vector& lhs, const Vector& rhs);
 
 std::ostream& operator<<(std::ostream &out, const Vector &vec);
 

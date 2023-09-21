@@ -49,6 +49,12 @@ double dot(const Vector& lhs, const Vector& rhs) {
            lhs.z * rhs.z;
 }
 
+Vector cross(const Vector& u, const Vector& v) {
+    return Vector(u.y * v.z - u.z * v.y,
+                  u.z * v.x - u.x * v.z,
+                  u.x * v.y - u.y * v.x);
+}
+
 Vector random_unit_vector() {
     Vector random_vec;
 
