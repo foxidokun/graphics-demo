@@ -50,6 +50,7 @@ static void render_preview_mode(const Scene& world) {
     sf::Image image = buffer.copyToImage();
 
     Renderer render(WINDOW_WIDTH, WINDOW_HEIGHT);
+    render.configure();
 
     while (window.isOpen()) {
         sf::Event event;

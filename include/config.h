@@ -2,6 +2,7 @@
 #define VECTOR_CONFIG_H
 
 #define PREVIEW_MODE 1
+#define PRINT_PROGRESS 1
 
 const int WINDOW_WIDTH = 400;
 const int WINDOW_HEIGHT = 300;

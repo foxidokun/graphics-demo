@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "renderer.h"
 #include "material.h"
 
@@ -6,46 +7,55 @@ static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pix
 static inline double gamma_correction(double value);
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth);
 
-void Renderer::initialize() {
-    camera_pos = Point(0, 0, 0);
-
+void Renderer::configure() {
     // Determine viewport dimensions.
-    auto focal_length = 1.0;
-    auto viewport_height = 2.0;
-    auto viewport_width = viewport_height * (((double)image_width)/image_height);
+    double focal_length = (lookfrom - lookat).length();
+    double theta = degrees_to_radians(vfov);
+    double h = tan(theta/2);
+    double viewport_height = 2 * h * focal_length;
+    double viewport_width = viewport_height * (((double)image_width)/image_height);
+
+    // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+    w = (lookfrom - lookat).norm();
+    u = cross(vup, w).norm();
+    v = cross(w, u);
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges.
-    auto viewport_u = Vector(viewport_width, 0, 0);
-    auto viewport_v = Vector(0, -viewport_height, 0);
+    Vector viewport_u = viewport_width * u;
+    Vector viewport_v = -viewport_height * v;
 
     // Calculate the horizontal and vertical delta vectors from pixel to pixel.
     pixel_delta_x = viewport_u / image_width;
     pixel_delta_y = viewport_v / image_height;
 
     // Calculate the location of the upper left pixel.
-    auto viewport_upper_left =
-        camera_pos - Vector(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
+    Point viewport_upper_left =
+        lookfrom - focal_length * w - viewport_u/2 - viewport_v/2;
     pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_x + pixel_delta_y);
 }
 
 void Renderer::render(sf::Image& image, const Hittable& world) const {
     #pragma omp parallel for
-    for (uint x = 0; x < image_width; ++x) {
-        for (uint y = 0; y < image_height; ++y) {
+    for (uint y = 0; y < image_height; ++y) {
+        for (uint x = 0; x < image_width; ++x) {
             Point pixel_center = pixel00_loc + (x * pixel_delta_x) + (y * pixel_delta_y);
             Color pixel_color;
 
             for (int i = 0; i < samples_num; ++i) {
                 Point pixel_sample = pixel_center + pixel_sample_square(pixel_delta_x, pixel_delta_y);
 
-                Vector ray_direction = pixel_sample - camera_pos;
-                Ray ray(camera_pos, ray_direction);
+                Vector ray_direction = pixel_sample - lookfrom;
+                Ray ray(lookfrom, ray_direction);
 
                 pixel_color += ray_color(ray, world, render_depth); 
             }
 
             draw_pixel(image, pixel_color, x, y, samples_num);
         }
+
+        #if PRINT_PROGRESS
+            printf("Row %u finished \n", y);
+        #endif
     } 
 }
 

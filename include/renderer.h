@@ -15,27 +15,26 @@ class Renderer {
 private:
     int image_width;
     int image_height;
-    Point camera_pos;
     Point pixel00_loc; // Location of (0, 0) pixel
     Vector pixel_delta_x;
     Vector pixel_delta_y;
-    uint samples_num;
-    uint render_depth;
+    Vector u, v, w; // Camera frame basis vectors
 
-    void initialize();
 public:
-    
-    Renderer(int image_width, int image_height, uint samples_num = SAMPLES_NUM, uint render_depth = RENDER_DEPTH):
+    uint samples_num  = SAMPLES_NUM;
+    uint render_depth = RENDER_DEPTH;
+    double vfov       = 90;
+    Point lookfrom    = Point(0, 0, 1);
+    Point lookat      = Point(0, 0, 0);
+    Vector vup        = Vector(0, 1, 0);
+
+    Renderer(int image_width, int image_height):
     image_width(image_width),
-    image_height(image_height),
-    samples_num(samples_num),
-    render_depth(render_depth)
+    image_height(image_height)
     {
-        initialize();
+        configure();
     }
 
-
+    void configure();
     void render(sf::Image& image, const Hittable& world) const;
 };
-
-
