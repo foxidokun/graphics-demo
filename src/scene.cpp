@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "material.h"
 
 bool Scene::hit(const Ray& ray, const Interval& render_interval, HitData& hit_data) const {
     HitData tmp_data;
@@ -15,4 +16,14 @@ bool Scene::hit(const Ray& ray, const Interval& render_interval, HitData& hit_da
     }
 
     return hit_anything;
+}
+
+Scene::~Scene() {
+    for (size_t i = 0; i < objects.size(); ++i) {
+        delete (objects[i]);
+    }
+
+    for (size_t i = 0; i < materials.size(); ++i) {
+        delete (materials[i]);
+    }
 }

@@ -19,8 +19,8 @@ private:
     Vector pixel_delta_x;
     Vector pixel_delta_y;
     Vector u, v, w; // Camera frame basis vectors
-    Vector   defocus_disk_u;  // Defocus disk horizontal radius
-    Vector   defocus_disk_v;  // Defocus disk vertical radius
+    Vector defocus_disk_u;  // Defocus disk horizontal radius
+    Vector defocus_disk_v;  // Defocus disk vertical radius
 
 public:
     uint samples_num  = SAMPLES_NUM;

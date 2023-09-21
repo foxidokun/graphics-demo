@@ -12,7 +12,10 @@
 #include "interval.h"
 #include "material.h"
 
-static void render_preview_mode(const Scene& world);
+static void render_preview_mode(const Scene& world, const Renderer& render);
+static void render_to_image(const Scene& world, const Renderer& render, const char* filename);
+static void setup_render(Renderer& render);
+static void setup_scene(Scene& scene);
 
 int main() {
     const Lambertian material_ground = Lambertian(Color(0.8, 0.8, 0.0));
@@ -21,26 +24,19 @@ int main() {
     const Metal material_right       = Metal(Color(0.8, 0.6, 0.2), 1.0);
 
     Scene world;
+    Renderer render(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Sphere lawn(Point( 0.0, -100.5, -1.0), 100.0, &material_ground);
-    Sphere center(Point( 0.0,    0.0, -1.0),   0.5, &material_center);
-    Sphere left(Point(-1.0,    0.0, -1.0),   0.5, &material_left);
-    Sphere right(Point( 1.0,    0.0, -1.0),   0.5, &material_right);
-
-    world.add(&lawn);
-    world.add(&center);
-    world.add(&left);
-    world.add(&right);
+    setup_scene(world);
+    setup_render(render);
 
     #if PREVIEW_MODE
-        render_preview_mode(world);
+        render_preview_mode(world, render);
     #else
-        #error "Not implemented yet"
+        render_to_image(world, render, "output.png");
     #endif
 }
 
-
-static void render_preview_mode(const Scene& world) {
+static void render_preview_mode(const Scene& world, const Renderer& render) {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 
 	sf::Texture buffer;
@@ -48,16 +44,6 @@ static void render_preview_mode(const Scene& world) {
     buffer.create(WINDOW_WIDTH, WINDOW_HEIGHT);
     bufferSprite.setTexture(buffer);
     sf::Image image = buffer.copyToImage();
-
-    Renderer render(WINDOW_WIDTH, WINDOW_HEIGHT);
-    render.lookfrom = Point(-2, 2, 1);
-    render.lookat   = Point(0,0,-1);
-    render.vup      = Vector(0,1,0);
-    render.vfov     = 20;
-
-    render.defocus_angle = 10.0;
-    render.focus_dist    = 3.4;
-    render.configure();
 
     while (window.isOpen()) {
         sf::Event event;
@@ -76,4 +62,79 @@ static void render_preview_mode(const Scene& world) {
         // end the current frame
         window.display();
     }
+}
+
+static void render_to_image(const Scene& world, const Renderer& render, const char* filename) {
+    sf::Image image;
+    image.create(WINDOW_WIDTH, WINDOW_HEIGHT);
+    render.render(image, world);
+    image.saveToFile(filename);
+}
+
+static void setup_render(Renderer& render) {
+    render.samples_num  = SAMPLES_NUM;
+    render.render_depth = RENDER_DEPTH;
+
+    render.vfov     = 40;
+    render.lookfrom = Point(13,2,3);
+    render.lookat   = Point(0,0,0);
+    render.vup      = Vector(0,1,0);
+
+    render.defocus_angle = 0.6;
+    render.focus_dist    = 10.0;
+    
+    render.configure();
+}
+
+static void setup_scene(Scene& scene) {
+    Material *ground_material = new Lambertian(Color(0.5, 0.5, 0.5));
+    scene.register_material(ground_material);
+    Sphere *ground = new Sphere(Point(0,-1000,0), 1000, ground_material);
+    scene.add_object(ground);
+
+    for (int i = -15; i < 11; ++i) {
+        for (int j = -15; j < 11; ++j) {
+            double choose_mat = random_double();
+            Point center(i + 0.9*random_double(), 0.2, j + 0.9*random_double());
+            Material *sphere_material = nullptr;
+
+            if ((center - Point(4, 0.2, 0)).length() > 0.9) {
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    Color albedo = Color::random() * Color::random();
+                    sphere_material = new Lambertian(albedo);
+                } else if (choose_mat < 0.95) {
+                    // metal
+                    auto albedo = Color::random(0.5, 1);
+                    auto fuzz = random_double(0, 0.5);
+                    sphere_material = new Metal(albedo, fuzz);
+                } else {
+                    // glass
+                    sphere_material = new Dielectric(Color(1.0, 1.0, 1.0), 1.5);
+                }
+            }
+            
+            if (sphere_material) {
+                scene.register_material(sphere_material);
+                Sphere *sphere = new Sphere(center, 0.2, sphere_material);
+                scene.add_object(sphere);
+            }
+        }
+    }
+
+    Material *material1 = new Dielectric(Color(1.0, 1.0, 1.0), 1.5);
+    scene.register_material(material1);
+    Sphere *sphere1 = new Sphere(Point(0, 1, 0), 1.0, material1);
+    scene.add_object(sphere1);
+
+    Material *material2 = new Lambertian(Color(0.4, 0.2, 0.1));
+    scene.register_material(material2);
+    Sphere *sphere2 = new Sphere(Point(-4, 1, 0), 1.0, material2);
+    scene.add_object(sphere2);
+
+
+    Material *material3 = new Metal(Color(0.7, 0.6, 0.5), 0.0);
+    scene.register_material(material3);
+    Sphere *sphere3 = new Sphere(Point(4, 1, 0), 1.0, material3);
+    scene.add_object(sphere3);
 }

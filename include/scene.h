@@ -66,16 +66,23 @@ public:
 class Scene: public Hittable {
 private:
     std::vector<Hittable *> objects;
+    std::vector<Material *> materials;
 
 public:
     Scene() = default;
     Scene(Hittable* object) {
-        add(object);
+        add_object(object);
     }
 
-    void add(Hittable* object) {
+    void add_object(Hittable* object) {
         objects.push_back(object);
     }
+
+    void register_material(Material* material) {
+        materials.push_back(material);
+    }
+
+    ~Scene();
 
     bool hit(const Ray& ray, const Interval& render_interval, HitData& hit_data) const final;
 };
