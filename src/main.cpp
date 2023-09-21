@@ -50,6 +50,13 @@ static void render_preview_mode(const Scene& world) {
     sf::Image image = buffer.copyToImage();
 
     Renderer render(WINDOW_WIDTH, WINDOW_HEIGHT);
+    render.lookfrom = Point(-2, 2, 1);
+    render.lookat   = Point(0,0,-1);
+    render.vup      = Vector(0,1,0);
+    render.vfov     = 20;
+
+    render.defocus_angle = 10.0;
+    render.focus_dist    = 3.4;
     render.configure();
 
     while (window.isOpen()) {

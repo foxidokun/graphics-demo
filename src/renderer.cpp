@@ -6,13 +6,13 @@ static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int sample
 static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
 static inline double gamma_correction(double value);
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth);
+static Point defocus_disk_sample(const Point &center, const Vector& u, const Vector& v);
 
 void Renderer::configure() {
     // Determine viewport dimensions.
-    double focal_length = (lookfrom - lookat).length();
     double theta = degrees_to_radians(vfov);
     double h = tan(theta/2);
-    double viewport_height = 2 * h * focal_length;
+    double viewport_height = 2 * h * focus_dist;
     double viewport_width = viewport_height * (((double)image_width)/image_height);
 
     // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
@@ -30,8 +30,12 @@ void Renderer::configure() {
 
     // Calculate the location of the upper left pixel.
     Point viewport_upper_left =
-        lookfrom - focal_length * w - viewport_u/2 - viewport_v/2;
+        lookfrom - focus_dist * w - viewport_u/2 - viewport_v/2;
     pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_x + pixel_delta_y);
+
+    double defocus_radius = focus_dist * tan(degrees_to_radians(defocus_angle / 2));
+    defocus_disk_u = u * defocus_radius;
+    defocus_disk_v = v * defocus_radius;
 }
 
 void Renderer::render(sf::Image& image, const Hittable& world) const {
@@ -43,6 +47,8 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
 
             for (int i = 0; i < samples_num; ++i) {
                 Point pixel_sample = pixel_center + pixel_sample_square(pixel_delta_x, pixel_delta_y);
+                Point ray_origin = (defocus_angle <= 0) ?
+                    lookfrom : defocus_disk_sample(lookfrom, defocus_disk_u, defocus_disk_v);
 
                 Vector ray_direction = pixel_sample - lookfrom;
                 Ray ray(lookfrom, ray_direction);
@@ -102,7 +108,13 @@ static inline double gamma_correction(double value) {
 
 /// Returns a random point in the square surrounding a pixel at the origin.
 static Vector pixel_sample_square(const Vector& pixel_delta_x, const Vector& pixel_delta_y) {
-    auto px = -0.5 + random_double();
-    auto py = -0.5 + random_double();
+    double px = -0.5 + random_double();
+    double py = -0.5 + random_double();
     return (px * pixel_delta_x) + (py * pixel_delta_y);
+}
+
+static Point defocus_disk_sample(const Point &center, const Vector& u, const Vector& v) {
+    // Returns a random point in the camera defocus disk.
+    Vector p = random_in_unit_disk();
+    return center + (p.x * u) + (p.y * v);
 }

@@ -114,6 +114,7 @@ Vector cross(const Vector& lhs, const Vector& rhs);
 std::ostream& operator<<(std::ostream &out, const Vector &vec);
 
 Vector random_unit_vector();
+Vector random_in_unit_disk();
 Vector random_reflection(const Vector& norm);
 Vector reflect(const Vector& vec, const Vector& norm);
 Vector refract(const Vector& ray, const Vector& norm, double eta_rel);

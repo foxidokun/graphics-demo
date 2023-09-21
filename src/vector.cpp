@@ -71,6 +71,15 @@ Vector random_unit_vector() {
     return random_vec;
 }
 
+Vector random_in_unit_disk() {
+    while (true) {
+        Vector tmp = Vector(random_double(-1,1), random_double(-1,1), 0);
+        if (tmp.length_square() < 1) {
+            return tmp;
+        }
+    }
+}
+
 Vector random_reflection(const Vector& norm) {
     Vector reflected = random_unit_vector();
 
