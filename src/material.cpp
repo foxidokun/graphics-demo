@@ -12,8 +12,8 @@ static bool frenele_reflection(double cosine, double refraction_ratio);
 // They calculate whether and where the ray will scatter. And it's color 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Lambertian::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
-    // Lambertian distribution. p ~ cos (normal ^ ray)
+bool Matte::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
+    // Matte distribution. p ~ cos (normal ^ ray)
     Vector scatter_direction = hit.normal + random_unit_vector();
     if (scatter_direction.near_zero()) { // Fix bad random choices to avoid NaN or inf in divides
         scatter_direction = hit.normal;
@@ -35,7 +35,7 @@ bool Metal::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
+bool Glass::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
     hit_color = color;
     double refraction_ratio = hit.front_face ? (1.0 / refr_indx) : refr_indx;
 

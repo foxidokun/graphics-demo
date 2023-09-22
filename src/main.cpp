@@ -95,7 +95,7 @@ static void setup_render(Renderer& render) {
 }
 
 static void setup_scene(Scene& scene) {
-    Material *ground_material = new Lambertian(Color(0.5, 0.5, 0.5));
+    Material *ground_material = new Matte(Color(0.5, 0.5, 0.5));
     scene.register_material(ground_material);
     Sphere *ground = new Sphere(Point(0, -10000, 0), 10000, ground_material);
     scene.add_object(ground);
@@ -110,13 +110,13 @@ static void setup_scene(Scene& scene) {
             if ((center - Point(4, 0.2, 0)).length() > 0.9) {
                 if (choose_mat < 0.8) {                                             // diffuse
                     Color albedo = Color::random() * Color::random();
-                    sphere_material = new Lambertian(albedo);
+                    sphere_material = new Matte(albedo);
                 } else if (choose_mat < 0.91) {                                     // metal
                     Color albedo = Color::random(0.5, 1);
                     double fuzz = random_double(0, 0.4);
                     sphere_material = new Metal(albedo, fuzz);
                 } else {                                                            // glass
-                    sphere_material = new Dielectric(Color(1.0, 1.0, 1.0), 1.5);
+                    sphere_material = new Glass(Color(1.0, 1.0, 1.0), 1.5);
                 }
             }
 
@@ -129,12 +129,12 @@ static void setup_scene(Scene& scene) {
     }
 
     // three main spheres
-    Material *material1 = new Dielectric(Color(1.0, 1.0, 1.0), 1.5);
+    Material *material1 = new Glass(Color(1.0, 1.0, 1.0), 1.5);
     scene.register_material(material1);
     Sphere *sphere1 = new Sphere(Point(0, 1, 0), 1.0, material1);
     scene.add_object(sphere1);
 
-    Material *material2 = new Lambertian(Color(0.4, 0.2, 0.1));
+    Material *material2 = new Matte(Color(0.4, 0.2, 0.1));
     scene.register_material(material2);
     Sphere *sphere2 = new Sphere(Point(-4, 1, 0), 1.0, material2);
     scene.add_object(sphere2);
