@@ -1,5 +1,6 @@
-### Graphics demo
+![image](https://github.com/foxidokun/raytracing/blob/master/output.png)
 
+### Ray tracing
 This is small educational project from C++ course at MIPT.
 
 ### Functionality
