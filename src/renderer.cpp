@@ -9,7 +9,7 @@
 static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num);
 static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth);
-static Point defocus_disk_sample(const Point& center, const Vector& u, const Vector& v);
+static Point defocus_disk_sample(const Point& center, double radius, const Vector& u, const Vector& v);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Render self-configuration
@@ -30,16 +30,18 @@ void Renderer::configure() {
     Vector vp_horiz =  vp_width  * u;
     Vector vp_vert  = -vp_height * v;
 
-    // Calculate pixeldelta vectors
+    // Calculate pixel delta vectors
     pixel_delta_x = vp_horiz / image_width;
     pixel_delta_y = vp_vert / image_height;
 
-    // Calculate the location of the upper left pixel.
+    // (0, 0) pixel location
     pixel00_loc = lookfrom - focus_dist * w - vp_horiz / 2 - vp_vert / 2 + 0.5 * (pixel_delta_x + pixel_delta_y);
 
-    double defocus_radius = focus_dist * tan(degrees_to_radians(defocus_angle / 2));
-    defocus_disk_u = u * defocus_radius;
-    defocus_disk_v = v * defocus_radius;
+    if (defocus_angle > 0) {
+        defocus_radius = focus_dist * tan(degrees_to_radians(defocus_angle / 2));
+    } else {
+        defocus_radius = 0;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -51,7 +53,7 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
         uint finished_rows_cnt = 0;
     #endif
 
-    #pragma omp parallel for schedule(dynamic, 10)
+    #pragma omp parallel for schedule(dynamic, 10) // dynamic for dynamic job stealing, 10 is batch size
     for (uint y = 0; y < image_height; ++y) {
         for (uint x = 0; x < image_width; ++x) {
             Point pixel_center = pixel00_loc + (x * pixel_delta_x) + (y * pixel_delta_y);
@@ -59,8 +61,7 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
 
             for (int i = 0; i < samples_num; ++i) {
                 Point pixel_sample = pixel_center + pixel_sample_square(pixel_delta_x, pixel_delta_y);
-                Point ray_origin
-                    = (defocus_angle <= 0) ? lookfrom : defocus_disk_sample(lookfrom, defocus_disk_u, defocus_disk_v);
+                Point ray_origin = defocus_disk_sample(lookfrom, defocus_radius, u, v);
 
                 Vector ray_direction = pixel_sample - lookfrom;
                 Ray ray(lookfrom, ray_direction);
@@ -116,10 +117,12 @@ static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int sample
     Interval allowed_intensivity(0, 1.0);
     color /= samples_num;
 
+    // gamma correction
     double red   = sqrt(color.x);
     double green = sqrt(color.y);
     double blue  = sqrt(color.z);
 
+    // clamping just in case & anti normalizing
     red   = allowed_intensivity.clamp(red)   * 255.0;
     green = allowed_intensivity.clamp(green) * 255.0;
     blue  = allowed_intensivity.clamp(blue)  * 255.0;
@@ -129,24 +132,27 @@ static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int sample
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-/// Returns a random point in the square surrounding a pixel at the origin.
+/// Returns a random point in the square surrounding pixel
 static Vector pixel_sample_square(const Vector& pixel_delta_x, const Vector& pixel_delta_y) {
-    double px = -0.5 + random_double();
-    double py = -0.5 + random_double();
+    double px = random_double(-0.5, +0.5);
+    double py = random_double(-0.5, +0.5);
     return (px * pixel_delta_x) + (py * pixel_delta_y);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static Point defocus_disk_sample(const Point& center, const Vector& u, const Vector& v) {
-    Vector p;
-
-    while (true) {
-        p = Vector(random_double(-1, 1), random_double(-1, 1), 0);
-        if (p.length_square() <= 1) {
-            break;
-        }
+static Point defocus_disk_sample(const Point& center, double radius, const Vector& u, const Vector& v) {
+    if (radius == 0) { // in case of disabled defocus
+        return center;
     }
 
-    return center + (p.x * u) + (p.y * v);
+    double x = 1;
+    double y = 1;
+
+    while (x*x + y*y > 1) {
+        x = random_double(-1, 1);
+        y = random_double(-1, 1);
+    }
+
+    return center + (x * radius * u) + (y * radius * v);
 }
