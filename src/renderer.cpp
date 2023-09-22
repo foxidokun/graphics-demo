@@ -15,31 +15,27 @@ static Point defocus_disk_sample(const Point& center, const Vector& u, const Vec
 // Render self-configuration
 // ---------------------------------------------------------------------------------------------------------------------
 
-
-// TODO: Осознать
 void Renderer::configure() {
-    // Determine viewport dimensions.
-    double theta = degrees_to_radians(vfov);
-    double h = tan(theta / 2);
-    double viewport_height = 2 * h * focus_dist;
-    double viewport_width = viewport_height * (((double)image_width) / image_height);
+    // vp means viewport
+    double fov_rad = degrees_to_radians(vfov);
+    double vp_height = 2 * tan(fov_rad / 2) * focus_dist;
+    double vp_width = vp_height * (((double)image_width) / image_height); // preserve ratio
 
-    // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
-    w = (lookfrom - lookat).norm();
-    u = cross(vup, w).norm();
-    v = cross(w, u);
+    // Camera basic vectors
+    w = (lookfrom - lookat).norm(); // forward
+    u = cross(vup, w).norm();       // left
+    v = cross(w, u);                // up
 
-    // Calculate the vectors across the horizontal and down the vertical viewport edges.
-    Vector viewport_u = viewport_width * u;
-    Vector viewport_v = -viewport_height * v;
+    // Viewport sides
+    Vector vp_horiz =  vp_width  * u;
+    Vector vp_vert  = -vp_height * v;
 
-    // Calculate the horizontal and vertical delta vectors from pixel to pixel.
-    pixel_delta_x = viewport_u / image_width;
-    pixel_delta_y = viewport_v / image_height;
+    // Calculate pixeldelta vectors
+    pixel_delta_x = vp_horiz / image_width;
+    pixel_delta_y = vp_vert / image_height;
 
     // Calculate the location of the upper left pixel.
-    Point viewport_upper_left = lookfrom - focus_dist * w - viewport_u / 2 - viewport_v / 2;
-    pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_x + pixel_delta_y);
+    pixel00_loc = lookfrom - focus_dist * w - vp_horiz / 2 - vp_vert / 2 + 0.5 * (pixel_delta_x + pixel_delta_y);
 
     double defocus_radius = focus_dist * tan(degrees_to_radians(defocus_angle / 2));
     defocus_disk_u = u * defocus_radius;
@@ -50,7 +46,6 @@ void Renderer::configure() {
 // Actual rendering
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO: Осознать дефокус
 void Renderer::render(sf::Image& image, const Hittable& world) const {
     #if PRINT_PROGRESS
         uint finished_rows_cnt = 0;
@@ -89,7 +84,6 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
 // Ray math
 // ---------------------------------------------------------------------------------------------------------------------
 
-//TODO: Переименовать attenuation
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
     if (depth == 0) {
         return Color(0, 0, 0);
