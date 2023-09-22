@@ -1,9 +1,9 @@
 #ifndef VECTOR_VECTOR_H
 #define VECTOR_VECTOR_H
 
+#include "common.h"
 #include <SFML/Graphics.hpp>
 #include <cmath>
-#include "common.h"
 
 class Vector {
 public:
@@ -29,14 +29,14 @@ public:
         x(point[0]),
         y(point[1]),
         z(point[2])
-    {}
+        {}
 
     static Vector random() {
         return Vector(random_double(), random_double(), random_double());
     }
 
     static Vector random(double min, double max) {
-        return Vector(random_double(min,max), random_double(min,max), random_double(min,max));
+        return Vector(random_double(min, max), random_double(min, max), random_double(min, max));
     }
 
     // ############
@@ -94,13 +94,11 @@ public:
         return x * x + y * y + z * z;
     }
 
-    Vector norm() const;
-
     bool near_zero() const {
-        return (fabs(x) < NEAR_ZERO_VEC_1DLEN) &&
-               (fabs(y) < NEAR_ZERO_VEC_1DLEN) &&
-               (fabs(z) < NEAR_ZERO_VEC_1DLEN);
+        return (fabs(x) < NEAR_ZERO_VEC_1DLEN) && (fabs(y) < NEAR_ZERO_VEC_1DLEN) && (fabs(z) < NEAR_ZERO_VEC_1DLEN);
     }
+
+    Vector norm() const;
 };
 
 Vector operator*(const double& scalar, const Vector& vec);
@@ -111,7 +109,7 @@ Vector operator-(const Vector& lhs, const Vector& rhs);
 double dot(const Vector& lhs, const Vector& rhs);
 Vector cross(const Vector& lhs, const Vector& rhs);
 
-std::ostream& operator<<(std::ostream &out, const Vector &vec);
+std::ostream& operator<<(std::ostream& out, const Vector& vec);
 
 Vector random_unit_vector();
 Vector random_in_unit_disk();
@@ -119,4 +117,4 @@ Vector random_reflection(const Vector& norm);
 Vector reflect(const Vector& vec, const Vector& norm);
 Vector refract(const Vector& ray, const Vector& norm, double eta_rel);
 
-#endif //VECTOR_VECTOR_H
+#endif // VECTOR_VECTOR_H

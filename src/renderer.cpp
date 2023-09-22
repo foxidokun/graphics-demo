@@ -2,11 +2,18 @@
 #include "material.h"
 #include <cstdio>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Declarations
+// ---------------------------------------------------------------------------------------------------------------------
+
 static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num);
 static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
-static inline double gamma_correction(double value);
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth);
 static Point defocus_disk_sample(const Point& center, const Vector& u, const Vector& v);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Render self-configuration
+// ---------------------------------------------------------------------------------------------------------------------
 
 void Renderer::configure() {
     // Determine viewport dimensions.
@@ -37,12 +44,16 @@ void Renderer::configure() {
     defocus_disk_v = v * defocus_radius;
 }
 
-void Renderer::render(sf::Image& image, const Hittable& world) const {
-#if PRINT_PROGRESS
-    uint finished_rows_cnt = 0;
-#endif
+// ---------------------------------------------------------------------------------------------------------------------
+// Actual rendering
+// ---------------------------------------------------------------------------------------------------------------------
 
-#pragma omp parallel for schedule(dynamic, 10)
+void Renderer::render(sf::Image& image, const Hittable& world) const {
+    #if PRINT_PROGRESS
+        uint finished_rows_cnt = 0;
+    #endif
+
+    #pragma omp parallel for schedule(dynamic, 10)
     for (uint y = 0; y < image_height; ++y) {
         for (uint x = 0; x < image_width; ++x) {
             Point pixel_center = pixel00_loc + (x * pixel_delta_x) + (y * pixel_delta_y);
@@ -62,14 +73,18 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
             draw_pixel(image, pixel_color, x, y, samples_num);
         }
 
-#if PRINT_PROGRESS
-#pragma omp atomic
-        ++finished_rows_cnt;
+        #if PRINT_PROGRESS
+            #pragma omp atomic
+            ++finished_rows_cnt;
 
-        printf("Finished %u out of %u rows\n", finished_rows_cnt, image_height);
-#endif
+            printf("Finished %u out of %u rows\n", finished_rows_cnt, image_height);
+        #endif
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Ray math
+// ---------------------------------------------------------------------------------------------------------------------
 
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
     if (depth == 0) {
@@ -90,6 +105,11 @@ static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
     return (1.0 - a) * White + a * LightBlue;
 }
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Small static helpers
+// ---------------------------------------------------------------------------------------------------------------------
+
 static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num) {
     assert(x < image.getSize().x);
     assert(y < image.getSize().y);
@@ -97,20 +117,18 @@ static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int sample
     Interval allowed_intensivity(0, 1.0);
     color /= samples_num;
 
-    double red = gamma_correction(color.x);
-    double green = gamma_correction(color.y);
-    double blue = gamma_correction(color.z);
+    double red   = sqrt(color.x);
+    double green = sqrt(color.y);
+    double blue  = sqrt(color.z);
 
-    red = allowed_intensivity.clamp(red) * 255.0;
+    red   = allowed_intensivity.clamp(red) * 255.0;
     green = allowed_intensivity.clamp(green) * 255.0;
-    blue = allowed_intensivity.clamp(blue) * 255.0;
+    blue  = allowed_intensivity.clamp(blue) * 255.0;
 
     image.setPixel(x, y, sf::Color(red, green, blue));
 }
 
-static inline double gamma_correction(double value) {
-    return sqrt(value);
-}
+// ---------------------------------------------------------------------------------------------------------------------
 
 /// Returns a random point in the square surrounding a pixel at the origin.
 static Vector pixel_sample_square(const Vector& pixel_delta_x, const Vector& pixel_delta_y) {
@@ -118,6 +136,8 @@ static Vector pixel_sample_square(const Vector& pixel_delta_x, const Vector& pix
     double py = -0.5 + random_double();
     return (px * pixel_delta_x) + (py * pixel_delta_y);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 static Point defocus_disk_sample(const Point& center, const Vector& u, const Vector& v) {
     // Returns a random point in the camera defocus disk.

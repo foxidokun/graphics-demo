@@ -25,15 +25,14 @@ public:
 
     Point() = default;
 
-    Point(double x, double y, double z): 
-        x(x),
-        y(y),
-        z(z)
-        {};
+    Point(double x, double y, double z)
+        : x(x)
+        , y(y)
+        , z(z) {};
 };
 
 static inline Point operator+(const Point& point, const Vector& vec) {
-    return {point.x + vec.x, point.y + vec.y, point.z + vec.z};
+    return { point.x + vec.x, point.y + vec.y, point.z + vec.z };
 }
 
 static inline Point operator+(const Vector& vec, const Point& point) {
@@ -41,7 +40,7 @@ static inline Point operator+(const Vector& vec, const Point& point) {
 }
 
 static inline Point operator-(const Point& point, const Vector& vec) {
-    return {point.x - vec.x, point.y - vec.y, point.z - vec.z};
+    return { point.x - vec.x, point.y - vec.y, point.z - vec.z };
 }
 
 static inline Point operator-(const Vector& vec, const Point& point) {

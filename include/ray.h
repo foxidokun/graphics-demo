@@ -1,7 +1,7 @@
 #pragma once
 
-#include "vector.h"
 #include "primitives.h"
+#include "vector.h"
 
 class Ray {
 public:
@@ -9,10 +9,9 @@ public:
     Vector direction;
 
     Ray() = default;
-    Ray(const Point& origin, const Vector& direction):
-        origin(origin),
-        direction(direction)
-        {};
+    Ray(const Point& origin, const Vector& direction)
+        : origin(origin)
+        , direction(direction) {};
 
     Point at(double t) const {
         return origin + t * direction;

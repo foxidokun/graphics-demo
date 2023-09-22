@@ -3,11 +3,8 @@
 
 #include "config.h"
 #include "common.h"
-#include "coordinates.h"
-#include "interval.h"
 #include "material.h"
 #include "primitives.h"
-#include "ray.h"
 #include "renderer.h"
 #include "scene.h"
 #include "vector.h"
