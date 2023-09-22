@@ -24,5 +24,7 @@ const uint RENDER_DEPTH = 50;
 
 const char *const WINDOW_TITLE = "Render preview";
 const double NEAR_ZERO_VEC_1DLEN = 1e-5;
+const char *const OUTPUTFILE = "output.png";
+
 
 #endif //VECTOR_CONFIG_H

@@ -22,11 +22,11 @@ bool Metal::scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, R
 
 bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const {
     attenuation = albedo;
-    double refraction_ratio = hit.front_face ? (1.0/ir) : ir;
+    double refraction_ratio = hit.front_face ? (1.0 / ir) : ir;
 
     Vector unit_direction = ray_in.direction.norm();
     double cos_theta = fmin(dot(-unit_direction, hit.normal), 1.0);
-    double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
+    double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
     bool cannot_refract = refraction_ratio * sin_theta > 1.0;
     Vector direction;
@@ -41,10 +41,9 @@ bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& attenuati
     return true;
 }
 
-
 static double reflectance(double cosine, double refraction_ratio) {
     // Use Schlick's approximation for reflectance.
-    auto r0 = (1-refraction_ratio) / (1+refraction_ratio);
-    r0 = r0*r0;
-    return r0 + (1-r0)*pow((1 - cosine),5);
+    auto r0 = (1 - refraction_ratio) / (1 + refraction_ratio);
+    r0 = r0 * r0;
+    return r0 + (1 - r0) * pow((1 - cosine), 5);
 }

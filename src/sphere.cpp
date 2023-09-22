@@ -4,14 +4,14 @@ bool Sphere::hit(const Ray& ray, const Interval& render_interval, HitData& hit_d
     Vector oc = ray.origin - center;
     double a = ray.direction.length_square();
     double half_b = dot(oc, ray.direction);
-    double c = oc.length_square() - radius*radius;
-    double discriminant = half_b*half_b - a*c;
-    
+    double c = oc.length_square() - radius * radius;
+    double discriminant = half_b * half_b - a * c;
+
     if (discriminant < 0) {
         return false;
     }
-    
-    double sq_discr = sqrt(discriminant); 
+
+    double sq_discr = sqrt(discriminant);
 
     // // Find the nearest root that lies in the acceptable range.
     double root = (-half_b - sq_discr) / a;

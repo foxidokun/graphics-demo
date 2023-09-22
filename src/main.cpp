@@ -1,46 +1,41 @@
 #include <SFML/Graphics.hpp>
 #include <chrono>
 
-#include "coordinates.h"
-#include "vector.h"
-#include "renderer.h"
-#include "primitives.h"
-#include "ray.h"
 #include "config.h"
-#include "scene.h"
 #include "common.h"
+#include "coordinates.h"
 #include "interval.h"
 #include "material.h"
+#include "primitives.h"
+#include "ray.h"
+#include "renderer.h"
+#include "scene.h"
+#include "vector.h"
 
 static void render_preview_mode(const Scene& world, const Renderer& render);
-static void render_to_image(const Scene& world, const Renderer& render, const char* filename);
+static void render_to_image(const Scene& world, const Renderer& render, const char *filename);
 static void setup_render(Renderer& render);
 static void setup_scene(Scene& scene);
 
 int main() {
-    const Lambertian material_ground = Lambertian(Color(0.8, 0.8, 0.0));
-    const Lambertian material_center = Lambertian(Color(0.1, 0.2, 0.5));
-    const Dielectric material_left   = Dielectric(Color(1.0, 1.0, 1.0), 1.5);
-    const Metal material_right       = Metal(Color(0.8, 0.6, 0.2), 1.0);
-
     Scene world;
     Renderer render(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     setup_scene(world);
     setup_render(render);
 
-    #if PREVIEW_MODE
-        render_preview_mode(world, render);
-    #else
-        render_to_image(world, render, "output.png");
-    #endif
+#if PREVIEW_MODE
+    render_preview_mode(world, render);
+#else
+    render_to_image(world, render, OUTPUTFILE);
+#endif
 }
 
 static void render_preview_mode(const Scene& world, const Renderer& render) {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 
-	sf::Texture buffer;
-	sf::Sprite bufferSprite;
+    sf::Texture buffer;
+    sf::Sprite bufferSprite;
     buffer.create(WINDOW_WIDTH, WINDOW_HEIGHT);
     bufferSprite.setTexture(buffer);
     sf::Image image = buffer.copyToImage();
@@ -64,7 +59,7 @@ static void render_preview_mode(const Scene& world, const Renderer& render) {
     }
 }
 
-static void render_to_image(const Scene& world, const Renderer& render, const char* filename) {
+static void render_to_image(const Scene& world, const Renderer& render, const char *filename) {
     sf::Image image;
     image.create(WINDOW_WIDTH, WINDOW_HEIGHT);
     render.render(image, world);
@@ -76,26 +71,26 @@ static void setup_render(Renderer& render) {
     render.render_depth = RENDER_DEPTH;
 
     render.vfov     = 40;
-    render.lookfrom = Point(13,2,3);
-    render.lookat   = Point(0,0,0);
-    render.vup      = Vector(0,1,0);
+    render.lookfrom = Point(13, 2, 3);
+    render.lookat   = Point(0, 0, 0);
+    render.vup      = Vector(0, 1, 0);
 
     render.defocus_angle = 0.6;
     render.focus_dist    = 10.0;
-    
+
     render.configure();
 }
 
 static void setup_scene(Scene& scene) {
     Material *ground_material = new Lambertian(Color(0.5, 0.5, 0.5));
     scene.register_material(ground_material);
-    Sphere *ground = new Sphere(Point(0,-10000,0), 10000, ground_material);
+    Sphere *ground = new Sphere(Point(0, -10000, 0), 10000, ground_material);
     scene.add_object(ground);
 
     for (int i = -15; i < 11; ++i) {
         for (int j = -15; j < 11; ++j) {
             double choose_mat = random_double();
-            Point center(i + 0.9*random_double(), 0.2, j + 0.9*random_double());
+            Point center(i + 0.9 * random_double(), 0.2, j + 0.9 * random_double());
             Material *sphere_material = nullptr;
 
             if ((center - Point(4, 0.2, 0)).length() > 0.9) {
@@ -113,7 +108,7 @@ static void setup_scene(Scene& scene) {
                     sphere_material = new Dielectric(Color(1.0, 1.0, 1.0), 1.5);
                 }
             }
-            
+
             if (sphere_material) {
                 scene.register_material(sphere_material);
                 Sphere *sphere = new Sphere(center, 0.2, sphere_material);
@@ -131,7 +126,6 @@ static void setup_scene(Scene& scene) {
     scene.register_material(material2);
     Sphere *sphere2 = new Sphere(Point(-4, 1, 0), 1.0, material2);
     scene.add_object(sphere2);
-
 
     Material *material3 = new Metal(Color(0.7, 0.6, 0.5), 0.0);
     scene.register_material(material3);
