@@ -89,7 +89,7 @@ static void setup_render(Renderer& render) {
 static void setup_scene(Scene& scene) {
     Material *ground_material = new Lambertian(Color(0.5, 0.5, 0.5));
     scene.register_material(ground_material);
-    Sphere *ground = new Sphere(Point(0,-1000,0), 1000, ground_material);
+    Sphere *ground = new Sphere(Point(0,-1000,0), 10000, ground_material);
     scene.add_object(ground);
 
     for (int i = -15; i < 11; ++i) {
@@ -103,10 +103,10 @@ static void setup_scene(Scene& scene) {
                     // diffuse
                     Color albedo = Color::random() * Color::random();
                     sphere_material = new Lambertian(albedo);
-                } else if (choose_mat < 0.95) {
+                } else if (choose_mat < 0.91) {
                     // metal
                     auto albedo = Color::random(0.5, 1);
-                    auto fuzz = random_double(0, 0.5);
+                    auto fuzz = random_double(0, 0.4);
                     sphere_material = new Metal(albedo, fuzz);
                 } else {
                     // glass
