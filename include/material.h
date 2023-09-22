@@ -3,43 +3,43 @@
 #include "scene.h"
 
 class Material {
-    public:
-        virtual ~Material() = default;
+public:
+    virtual ~Material() = default;
 
-        virtual bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const = 0;
+    virtual bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const = 0;
 };
 
-class Lambertian: public Material {
+class Lambertian : public Material {
 public:
-    Color albedo;
+    Color color;
 
-    Lambertian(const Color& albedo) : albedo(albedo) {}
+    Lambertian(const Color& color): color(color) {}
 
-    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final;
+    bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const final;
 };
 
-class Metal: public Material {
+class Metal : public Material {
 public:
-    Color albedo;
+    Color color;
     double fuzz;
 
-    Metal(const Color& albedo, double fuzz):
-        albedo(albedo),
+    Metal(const Color& color, double fuzz):
+        color(color),
         fuzz(fuzz < 1 ? fuzz : 1)
         {}
 
-    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final;
+    bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const final;
 };
 
-class Dielectric: public Material {
+class Dielectric : public Material {
 public:
-    Color albedo;
+    Color color;
     double ir; // Index of Refraction
 
-    Dielectric(const Color& albedo,double index_of_refraction):
-        albedo(albedo),
+    Dielectric(const Color& albedo, double index_of_refraction):
+        color(color),
         ir(index_of_refraction)
         {}
 
-    bool scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const final;
+    bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const final;
 };

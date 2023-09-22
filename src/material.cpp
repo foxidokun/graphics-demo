@@ -1,27 +1,41 @@
 #include "material.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Declarations
+// ---------------------------------------------------------------------------------------------------------------------
+
 static double reflectance(double cosine, double refraction_ratio);
 
-bool Lambertian::scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const {
+// ---------------------------------------------------------------------------------------------------------------------
+// Scatter functions
+// 
+// They calculate whether and where the rays will scatter. And their 
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Lambertian::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
     Vector scatter_direction = hit.normal + random_unit_vector();
-    if (scatter_direction.near_zero()) { // Fix bad random choices
+    if (scatter_direction.near_zero()) { // Fix bad random choices to avoid NaN, inf in divides
         scatter_direction = hit.normal;
     }
 
     scattered = Ray(hit.p, scatter_direction);
-    attenuation = albedo;
+    hit_color = color;
     return true;
 }
 
-bool Metal::scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const {
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Metal::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
     Vector reflected = reflect(ray_in.direction.norm(), hit.normal);
     scattered = Ray(hit.p, reflected + fuzz * random_unit_vector());
-    attenuation = albedo;
+    hit_color = color;
     return (dot(scattered.direction, hit.normal) > 0.0);
 }
 
-bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& attenuation, Ray& scattered) const {
-    attenuation = albedo;
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
+    hit_color = color;
     double refraction_ratio = hit.front_face ? (1.0 / ir) : ir;
 
     Vector unit_direction = ray_in.direction.norm();
@@ -41,9 +55,13 @@ bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& attenuati
     return true;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Internal static functions
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Schlick's approximation for reflectance
 static double reflectance(double cosine, double refraction_ratio) {
-    // Use Schlick's approximation for reflectance.
-    auto r0 = (1 - refraction_ratio) / (1 + refraction_ratio);
+    double r0 = (1 - refraction_ratio) / (1 + refraction_ratio);
     r0 = r0 * r0;
     return r0 + (1 - r0) * pow((1 - cosine), 5);
 }
