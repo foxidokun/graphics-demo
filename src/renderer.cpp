@@ -50,7 +50,8 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
 
             for (int i = 0; i < samples_num; ++i) {
                 Point pixel_sample = pixel_center + pixel_sample_square(pixel_delta_x, pixel_delta_y);
-                Point ray_origin = (defocus_angle <= 0) ? lookfrom : defocus_disk_sample(lookfrom, defocus_disk_u, defocus_disk_v);
+                Point ray_origin
+                    = (defocus_angle <= 0) ? lookfrom : defocus_disk_sample(lookfrom, defocus_disk_u, defocus_disk_v);
 
                 Vector ray_direction = pixel_sample - lookfrom;
                 Ray ray(lookfrom, ray_direction);
