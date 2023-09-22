@@ -63,7 +63,7 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
                 Point pixel_sample = pixel_center + pixel_sample_square(pixel_delta_x, pixel_delta_y);
                 Point ray_origin = defocus_disk_sample(lookfrom, defocus_radius, u, v);
 
-                Vector ray_direction = pixel_sample - lookfrom;
+                Vector ray_direction = pixel_sample - ray_origin;
                 Ray ray(lookfrom, ray_direction);
 
                 pixel_color += ray_color(ray, world, render_depth);

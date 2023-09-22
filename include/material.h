@@ -36,7 +36,7 @@ public:
     Color color;
     double refr_indx; // refraction index
 
-    Glass(const Color& albedo, double refraction_index):
+    Glass(const Color& color, double refraction_index):
         color(color),
         refr_indx(refraction_index)
         {}
