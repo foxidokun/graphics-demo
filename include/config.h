@@ -3,12 +3,12 @@
 
 typedef unsigned int uint;
 
-#define PREVIEW_MODE 0
+#define PREVIEW_MODE 1
 
 #if PREVIEW_MODE
 const int WINDOW_WIDTH  = 720;
 const int WINDOW_HEIGHT = 480;
-const uint SAMPLES_NUM  = 10;
+const uint SAMPLES_NUM  = 2;
 const uint RENDER_DEPTH = 10;
 
 #define PRINT_PROGRESS 0

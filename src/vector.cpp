@@ -2,14 +2,18 @@
 
 #include "vector.h"
 
-// #####################################################################################################################
+// ---------------------------------------------------------------------------------------------------------------------
 // Operators
-// #####################################################################################################################
+// ---------------------------------------------------------------------------------------------------------------------
 
 Vector operator*(const double& scalar, const Vector& vec) {
     Vector copy = vec;
     copy *= scalar;
     return copy;
+}
+
+Vector operator*(const Vector& lhs, const Vector& rhs) {
+    return Vector(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
 }
 
 Vector operator+(const Vector& lhs, const Vector& rhs) {
@@ -29,13 +33,9 @@ std::ostream& operator<<(std::ostream& out, const Vector& vec) {
     return out;
 }
 
-Vector operator*(const Vector& lhs, const Vector& rhs) {
-    return Vector(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
-}
-
-// #####################################################################################################################
+// ---------------------------------------------------------------------------------------------------------------------
 // General purpose methods
-// #####################################################################################################################
+// ---------------------------------------------------------------------------------------------------------------------
 
 Vector Vector::norm() const {
     double len = length();
@@ -54,13 +54,17 @@ Vector cross(const Vector& u, const Vector& v) {
                   u.x * v.y - u.y * v.x);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Randomization
+// ---------------------------------------------------------------------------------------------------------------------
+
 Vector random_unit_vector() {
     Vector random_vec;
 
     while (true) {
         random_vec = Vector::random(-1.0, +1.0);
         double len_aq = random_vec.length_square();
-        if (len_aq <= 1 && len_aq >= 0.01) {
+        if (len_aq <= 1 && len_aq >= 0.01) { // > 0.01 to protect from NaN / inf / etc
             break;
         }
     }
@@ -70,15 +74,7 @@ Vector random_unit_vector() {
     return random_vec;
 }
 
-Vector random_in_unit_disk() {
-    while (true) {
-        Vector tmp = Vector(random_double(-1, 1), random_double(-1, 1), 0);
-        if (tmp.length_square() < 1) {
-            return tmp;
-        }
-    }
-}
-
+// random ray, but not into surface
 Vector random_reflection(const Vector& norm) {
     Vector reflected = random_unit_vector();
 
@@ -89,18 +85,22 @@ Vector random_reflection(const Vector& norm) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Reflecting
+// ---------------------------------------------------------------------------------------------------------------------
+
 Vector reflect(const Vector& vec, const Vector& norm) {
     return vec - 2 * dot(vec, norm) * norm;
 }
 
-/// @brief
-/// @param ray
-/// @param norm
-/// @param eta_rel -- relative eta of materials
-/// @return
+/// @brief get refracted ray
+/// @param ray 
+/// @param norm normal to surface 
+/// @param eta_rel ratio of the refractive indices
+/// @return refracted ray
 Vector refract(const Vector& ray, const Vector& norm, double eta_rel) {
-    double cos_theta = fmin(dot(-ray, norm), 1.0);
-    Vector r_out_perp = eta_rel * (ray + cos_theta * norm);
-    Vector r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_square())) * norm;
-    return r_out_perp + r_out_parallel;
+    double cos_theta = dot(-ray, norm);
+    Vector perp = eta_rel * (ray + cos_theta * norm);
+    Vector parallel = -sqrt(fabs(1.0 - perp.length_square())) * norm;
+    return perp + parallel;
 }

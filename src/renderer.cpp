@@ -15,6 +15,8 @@ static Point defocus_disk_sample(const Point& center, const Vector& u, const Vec
 // Render self-configuration
 // ---------------------------------------------------------------------------------------------------------------------
 
+
+// TODO: Осознать
 void Renderer::configure() {
     // Determine viewport dimensions.
     double theta = degrees_to_radians(vfov);
@@ -48,6 +50,7 @@ void Renderer::configure() {
 // Actual rendering
 // ---------------------------------------------------------------------------------------------------------------------
 
+//TODO: Осознать дефокус
 void Renderer::render(sf::Image& image, const Hittable& world) const {
     #if PRINT_PROGRESS
         uint finished_rows_cnt = 0;
@@ -86,6 +89,7 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
 // Ray math
 // ---------------------------------------------------------------------------------------------------------------------
 
+//TODO: Переименовать attenuation
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
     if (depth == 0) {
         return Color(0, 0, 0);
@@ -94,9 +98,10 @@ static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
     HitData hit;
     if (world.hit(ray, Interval(0.0001, infinity), hit)) {
         Ray scattered;
-        Color attenuation;
-        if (hit.mat->scatter(ray, hit, attenuation, scattered))
-            return attenuation * ray_color(scattered, world, depth - 1);
+        Color color;
+        if (hit.mat->scatter(ray, hit, color, scattered)) {
+            return color * ray_color(scattered, world, depth - 1);
+        }
         return Color(0, 0, 0);
     }
 
@@ -121,9 +126,9 @@ static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int sample
     double green = sqrt(color.y);
     double blue  = sqrt(color.z);
 
-    red   = allowed_intensivity.clamp(red) * 255.0;
+    red   = allowed_intensivity.clamp(red)   * 255.0;
     green = allowed_intensivity.clamp(green) * 255.0;
-    blue  = allowed_intensivity.clamp(blue) * 255.0;
+    blue  = allowed_intensivity.clamp(blue)  * 255.0;
 
     image.setPixel(x, y, sf::Color(red, green, blue));
 }
@@ -140,7 +145,14 @@ static Vector pixel_sample_square(const Vector& pixel_delta_x, const Vector& pix
 // ---------------------------------------------------------------------------------------------------------------------
 
 static Point defocus_disk_sample(const Point& center, const Vector& u, const Vector& v) {
-    // Returns a random point in the camera defocus disk.
-    Vector p = random_in_unit_disk();
+    Vector p;
+
+    while (true) {
+        p = Vector(random_double(-1, 1), random_double(-1, 1), 0);
+        if (p.length_square() <= 1) {
+            break;
+        }
+    }
+
     return center + (p.x * u) + (p.y * v);
 }

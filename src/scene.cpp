@@ -22,6 +22,7 @@ bool Scene::hit(const Ray& ray, const Interval& render_interval, HitData& hit_da
 // Ray math
 // ---------------------------------------------------------------------------------------------------------------------
 
+// in external file due to cyclic import problem
 Scene::~Scene() {
     for (size_t i = 0; i < objects.size(); ++i) {
         delete (objects[i]);

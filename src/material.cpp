@@ -9,12 +9,13 @@ static double reflectance(double cosine, double refraction_ratio);
 // ---------------------------------------------------------------------------------------------------------------------
 // Scatter functions
 // 
-// They calculate whether and where the rays will scatter. And their 
+// They calculate whether and where the ray will scatter. And it's color 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Lambertian::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
+    // Lambertian distribution. p ~ cos (normal ^ ray)
     Vector scatter_direction = hit.normal + random_unit_vector();
-    if (scatter_direction.near_zero()) { // Fix bad random choices to avoid NaN, inf in divides
+    if (scatter_direction.near_zero()) { // Fix bad random choices to avoid NaN or inf in divides
         scatter_direction = hit.normal;
     }
 
@@ -27,7 +28,7 @@ bool Lambertian::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color
 
 bool Metal::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
     Vector reflected = reflect(ray_in.direction.norm(), hit.normal);
-    scattered = Ray(hit.p, reflected + fuzz * random_unit_vector());
+    scattered = Ray(hit.p, reflected + fuzz * random_unit_vector()); // Add some noise
     hit_color = color;
     return (dot(scattered.direction, hit.normal) > 0.0);
 }

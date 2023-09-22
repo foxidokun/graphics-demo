@@ -1,10 +1,11 @@
 #include "scene.h"
 
 bool Sphere::hit(const Ray& ray, const Interval& render_interval, HitData& hit_data) const {
-    Vector oc = ray.origin - center;
+    // CO means Center->Origin vector
+    Vector co = ray.origin - center;
     double a = ray.direction.length_square();
-    double half_b = dot(oc, ray.direction);
-    double c = oc.length_square() - radius * radius;
+    double half_b = dot(co, ray.direction);
+    double c = co.length_square() - radius * radius;
     double discriminant = half_b * half_b - a * c;
 
     if (discriminant < 0) {
@@ -13,11 +14,11 @@ bool Sphere::hit(const Ray& ray, const Interval& render_interval, HitData& hit_d
 
     double sq_discr = sqrt(discriminant);
 
-    // // Find the nearest root that lies in the acceptable range.
+    // Find the nearest root that is good enough
     double root = (-half_b - sq_discr) / a;
-    if (!render_interval.surrounds(root)) {
+    if (!render_interval.contains(root)) {
         root = (-half_b + sq_discr) / a;
-        if (!render_interval.surrounds(root)) {
+        if (!render_interval.contains(root)) {
             return false;
         }
     }
@@ -25,9 +26,9 @@ bool Sphere::hit(const Ray& ray, const Interval& render_interval, HitData& hit_d
     // Record and store some data about hit
     hit_data.t = root;
     hit_data.p = ray.at(hit_data.t);
-    Vector outward_normal = (hit_data.p - center) / radius;
-    hit_data.set_face_normal(ray, outward_normal);
     hit_data.mat = mat;
+    Vector norm = (hit_data.p - center) / radius;
+    hit_data.set_face_normal(ray, norm);
 
     return true;
 }
