@@ -12,8 +12,8 @@
 
 class Renderer {
 private:
-    int image_width;
-    int image_height;
+    uint image_width;
+    uint image_height;
     Point pixel00_loc;
     Vector pixel_delta_x;
     Vector pixel_delta_y;
@@ -30,7 +30,7 @@ public:
     double defocus_angle = 0;
     double focus_dist    = 10;
 
-    Renderer(int image_width, int image_height):
+    Renderer(uint image_width, uint image_height):
         image_width(image_width),
         image_height(image_height)
     {

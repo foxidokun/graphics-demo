@@ -6,7 +6,7 @@
 // Declarations
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num);
+static void draw_pixel(sf::Image& image, Color color, uint x, uint y, uint samples_num);
 static Vector pixel_sample_square(const Vector& pixel_delta_u, const Vector& pixel_delta_v);
 static Color ray_color(const Ray& ray, const Hittable& world, uint depth);
 static Point defocus_disk_sample(const Point& center, double radius, const Vector& u, const Vector& v);
@@ -59,7 +59,7 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
             Point pixel_center = pixel00_loc + (x * pixel_delta_x) + (y * pixel_delta_y);
             Color pixel_color;
 
-            for (int i = 0; i < samples_num; ++i) {
+            for (uint i = 0; i < samples_num; ++i) {
                 Point pixel_sample = pixel_center + pixel_sample_square(pixel_delta_x, pixel_delta_y);
                 Point ray_origin = defocus_disk_sample(lookfrom, defocus_radius, u, v);
 
@@ -110,7 +110,7 @@ static Color ray_color(const Ray& ray, const Hittable& world, uint depth) {
 // Small static helpers
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void draw_pixel(sf::Image& image, Color color, uint x, uint y, int samples_num) {
+static void draw_pixel(sf::Image& image, Color color, uint x, uint y, uint samples_num) {
     assert(x < image.getSize().x);
     assert(y < image.getSize().y);
 

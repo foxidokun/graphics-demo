@@ -12,7 +12,7 @@ static bool frenele_reflection(double cosine, double refraction_ratio);
 // They calculate whether and where the ray will scatter. And it's color 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Matte::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
+bool Matte::scatter(const Ray&, const HitData& hit, Color& hit_color, Ray& scattered) const {
     // Matte distribution. p ~ cos (normal ^ ray)
     Vector scatter_direction = hit.normal + random_unit_vector();
     if (scatter_direction.near_zero()) { // Fix bad random choices to avoid NaN or inf in divides
