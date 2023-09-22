@@ -12,10 +12,18 @@
 #include "scene.h"
 #include "vector.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Declarations
+// ---------------------------------------------------------------------------------------------------------------------
+
 static void render_preview_mode(const Scene& world, const Renderer& render);
 static void render_to_image(const Scene& world, const Renderer& render, const char *filename);
 static void setup_render(Renderer& render);
 static void setup_scene(Scene& scene);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// -> Entrypoint <-
+// ---------------------------------------------------------------------------------------------------------------------
 
 int main() {
     Scene world;
@@ -30,6 +38,10 @@ int main() {
     render_to_image(world, render, OUTPUTFILE);
 #endif
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Render modes
+// ---------------------------------------------------------------------------------------------------------------------
 
 static void render_preview_mode(const Scene& world, const Renderer& render) {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
@@ -50,11 +62,10 @@ static void render_preview_mode(const Scene& world, const Renderer& render) {
         }
 
         render.render(image, world);
+
+        // display
         buffer.loadFromImage(image);
-
         window.draw(bufferSprite);
-
-        // end the current frame
         window.display();
     }
 }
@@ -65,6 +76,10 @@ static void render_to_image(const Scene& world, const Renderer& render, const ch
     render.render(image, world);
     image.saveToFile(filename);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Setup functions
+// ---------------------------------------------------------------------------------------------------------------------
 
 static void setup_render(Renderer& render) {
     render.samples_num  = SAMPLES_NUM;
@@ -78,6 +93,7 @@ static void setup_render(Renderer& render) {
     render.defocus_angle = 0.6;
     render.focus_dist    = 10.0;
 
+    // reconfigure after changing parameters
     render.configure();
 }
 
@@ -87,6 +103,7 @@ static void setup_scene(Scene& scene) {
     Sphere *ground = new Sphere(Point(0, -10000, 0), 10000, ground_material);
     scene.add_object(ground);
 
+    // spawm little spheres
     for (int i = -15; i < 11; ++i) {
         for (int j = -15; j < 11; ++j) {
             double choose_mat = random_double();
@@ -94,17 +111,14 @@ static void setup_scene(Scene& scene) {
             Material *sphere_material = nullptr;
 
             if ((center - Point(4, 0.2, 0)).length() > 0.9) {
-                if (choose_mat < 0.8) {
-                    // diffuse
+                if (choose_mat < 0.8) {                                             // diffuse
                     Color albedo = Color::random() * Color::random();
                     sphere_material = new Lambertian(albedo);
-                } else if (choose_mat < 0.91) {
-                    // metal
-                    auto albedo = Color::random(0.5, 1);
-                    auto fuzz = random_double(0, 0.4);
+                } else if (choose_mat < 0.91) {                                     // metal
+                    Color albedo = Color::random(0.5, 1);
+                    double fuzz = random_double(0, 0.4);
                     sphere_material = new Metal(albedo, fuzz);
-                } else {
-                    // glass
+                } else {                                                            // glass
                     sphere_material = new Dielectric(Color(1.0, 1.0, 1.0), 1.5);
                 }
             }
@@ -117,6 +131,7 @@ static void setup_scene(Scene& scene) {
         }
     }
 
+    // three main spheres
     Material *material1 = new Dielectric(Color(1.0, 1.0, 1.0), 1.5);
     scene.register_material(material1);
     Sphere *sphere1 = new Sphere(Point(0, 1, 0), 1.0, material1);
