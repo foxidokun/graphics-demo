@@ -39,6 +39,10 @@ void Renderer::configure() {
 }
 
 void Renderer::render(sf::Image& image, const Hittable& world) const {
+    #if PRINT_PROGRESS
+        uint finished_rows_cnt = 0;
+    #endif
+
     #pragma omp parallel for
     for (uint y = 0; y < image_height; ++y) {
         for (uint x = 0; x < image_width; ++x) {
@@ -60,7 +64,10 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
         }
 
         #if PRINT_PROGRESS
-            printf("Row %u finished \n", y);
+            #pragma omp atomic 
+            ++finished_rows_cnt;
+
+            printf("Finished %u out of %u rows\n", finished_rows_cnt, image_height);
         #endif
     } 
 }
