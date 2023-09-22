@@ -10,6 +10,7 @@ public:
         min(+infinity),
         max(-infinity)
         {}
+
     Interval(double min, double max):
         min(min),
         max(max)

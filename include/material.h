@@ -9,7 +9,7 @@ public:
     virtual bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const = 0;
 };
 
-class Lambertian : public Material {
+class Lambertian: public Material {
 public:
     Color color;
 
@@ -18,7 +18,7 @@ public:
     bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const final;
 };
 
-class Metal : public Material {
+class Metal: public Material {
 public:
     Color color;
     double fuzz;
@@ -31,14 +31,14 @@ public:
     bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const final;
 };
 
-class Dielectric : public Material {
+class Dielectric: public Material {
 public:
     Color color;
-    double ir; // Index of Refraction
+    double refr_indx; // refraction index
 
-    Dielectric(const Color& albedo, double index_of_refraction):
+    Dielectric(const Color& albedo, double refraction_index):
         color(color),
-        ir(index_of_refraction)
+        refr_indx(refraction_index)
         {}
 
     bool scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const final;

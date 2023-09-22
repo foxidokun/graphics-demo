@@ -4,7 +4,7 @@
 // Declarations
 // ---------------------------------------------------------------------------------------------------------------------
 
-static double reflectance(double cosine, double refraction_ratio);
+static bool frenele_reflection(double cosine, double refraction_ratio);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Scatter functions
@@ -37,16 +37,16 @@ bool Metal::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray
 
 bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color, Ray& scattered) const {
     hit_color = color;
-    double refraction_ratio = hit.front_face ? (1.0 / ir) : ir;
+    double refraction_ratio = hit.front_face ? (1.0 / refr_indx) : refr_indx;
 
     Vector unit_direction = ray_in.direction.norm();
-    double cos_theta = fmin(dot(-unit_direction, hit.normal), 1.0);
+    double cos_theta = fmin(dot(-unit_direction, hit.normal), 1.0); // just in case for sqrt in sin
     double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
     bool cannot_refract = refraction_ratio * sin_theta > 1.0;
     Vector direction;
 
-    if (cannot_refract || reflectance(cos_theta, refraction_ratio) > random_double()) {
+    if (cannot_refract || frenele_reflection(cos_theta, refraction_ratio)) {
         direction = reflect(unit_direction, hit.normal);
     } else {
         direction = refract(unit_direction, hit.normal, refraction_ratio);
@@ -60,9 +60,12 @@ bool Dielectric::scatter(const Ray& ray_in, const HitData& hit, Color& hit_color
 // Internal static functions
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Schlick's approximation for reflectance
-static double reflectance(double cosine, double refraction_ratio) {
+// probability based impolementation of partitial wave reflection / refraction.
+// Uses Schlick's approximation for reflectance
+// https://en.wikipedia.org/wiki/Schlick%27s_approximation
+static bool frenele_reflection(double cosine, double refraction_ratio) {
     double r0 = (1 - refraction_ratio) / (1 + refraction_ratio);
     r0 = r0 * r0;
-    return r0 + (1 - r0) * pow((1 - cosine), 5);
+    double r = r0 + (1 - r0) * pow((1 - cosine), 5);
+    return r > random_double();
 }
