@@ -89,7 +89,7 @@ static void setup_render(Renderer& render) {
 static void setup_scene(Scene& scene) {
     Material *ground_material = new Lambertian(Color(0.5, 0.5, 0.5));
     scene.register_material(ground_material);
-    Sphere *ground = new Sphere(Point(0,-1000,0), 10000, ground_material);
+    Sphere *ground = new Sphere(Point(0,-10000,0), 10000, ground_material);
     scene.add_object(ground);
 
     for (int i = -15; i < 11; ++i) {
