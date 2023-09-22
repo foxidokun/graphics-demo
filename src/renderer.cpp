@@ -43,7 +43,7 @@ void Renderer::render(sf::Image& image, const Hittable& world) const {
         uint finished_rows_cnt = 0;
     #endif
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic, 10)
     for (uint y = 0; y < image_height; ++y) {
         for (uint x = 0; x < image_width; ++x) {
             Point pixel_center = pixel00_loc + (x * pixel_delta_x) + (y * pixel_delta_y);
