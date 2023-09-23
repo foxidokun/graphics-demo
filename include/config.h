@@ -3,6 +3,7 @@
 
 typedef unsigned int uint;
 
+#define ALWAYS_SAME_RANDOM 0
 #define PREVIEW_MODE 1
 
 #if PREVIEW_MODE

@@ -15,8 +15,14 @@ const double infinity = std::numeric_limits<double>::infinity();
 
 // Random real in [0,1).
 static inline double random_double() {
-    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+#if !ALWAYS_SAME_RANDOM
+    std::random_device rd;
+    static std::mt19937 generator(rd());
+#else
     static std::mt19937 generator;
+#endif
+
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
     return distribution(generator);
 }
 
