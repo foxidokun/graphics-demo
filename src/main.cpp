@@ -87,7 +87,7 @@ static void setup_render(Renderer& render) {
     render.lookat   = Point(0, 0, 0);
     render.vup      = Vector(0, 1, 0);
 
-    render.defocus_angle = 0.6;
+    render.defocus_angle = 0; // disable defocus for now
     render.focus_dist    = 10.0;
 
     // reconfigure after changing parameters
